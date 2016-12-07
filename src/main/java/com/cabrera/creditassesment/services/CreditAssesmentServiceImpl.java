@@ -3,6 +3,8 @@
  */
 package com.cabrera.creditassesment.services;
 
+import java.util.concurrent.ExecutionException;
+
 import com.cabrera.creditassesment.beans.Amount;
 import com.cabrera.creditassesment.beans.CreditAssesment;
 import com.cabrera.creditassesment.beans.Customer;
@@ -21,7 +23,7 @@ public class CreditAssesmentServiceImpl implements CreditAssesmentService {
 		this.engine = engine;
 	}
 
-	public CreditAssesment evaluate(Customer customer, Amount amount) {
+	public CreditAssesment evaluate(Customer customer, Amount amount) throws InterruptedException, ExecutionException {
 		return engine.evaluate(customer, amount);
 	}
 

@@ -11,15 +11,16 @@ import com.cabrera.creditassesment.beans.Customer;
  */
 public class MasterCardService implements CreditCardService {
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.cabrera.creditassesment.services.broker.CreditCardService#hasCreditDebts
-	 * (com.cabrera.creditassesment.beans.Customer)
-	 */
-	public Boolean hasCreditDebts(Customer customer) {
+	private Customer customer;
+	
+	public MasterCardService(Customer customer) {
+		super();
+		this.customer = customer;
+	}
 
+	@Override
+	public Boolean call() throws Exception {
+		System.out.println("calling masterCard for customer " + customer);
 		// WS Connection Latency Time Simulation
 		try {
 			Thread.sleep((long) (Math.random() * 60000));
@@ -29,5 +30,5 @@ public class MasterCardService implements CreditCardService {
 
 		return Math.random() < 0.5;
 	}
-
+	
 }

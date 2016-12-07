@@ -3,14 +3,13 @@
  */
 package com.cabrera.creditassesment.services.broker;
 
-import com.cabrera.creditassesment.beans.Customer;
+import java.util.concurrent.Callable;
 
 /**
  * Broker Credit Card Service Interface
  * 
  * @author L0656968
  */
-public interface CreditCardService {
+public interface CreditCardService extends Callable<Boolean> {
 
-	Boolean hasCreditDebts(Customer customer);
 }

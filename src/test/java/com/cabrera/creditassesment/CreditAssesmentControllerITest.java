@@ -7,6 +7,7 @@ import static org.junit.Assert.assertFalse;
 
 import java.util.Currency;
 import java.util.Locale;
+import java.util.concurrent.ExecutionException;
 
 import org.junit.Test;
 
@@ -22,9 +23,11 @@ public class CreditAssesmentControllerITest {
 	
 	/**
 	 * Test method for {@link com.cabrera.creditassesment.CreditAssesmentController#evaluate(com.cabrera.creditassesment.beans.Customer, com.cabrera.creditassesment.beans.Amount)}.
+	 * @throws ExecutionException Execution Exception
+	 * @throws InterruptedException Interrupted Exception
 	 */
 	@Test
-	public void testEvaluate() {
+	public void testEvaluate() throws InterruptedException, ExecutionException {
 		Customer c = new Person("Andr�s", "Cabrera Laden");
 		Amount a = new Amount(50d, Currency.getInstance(Locale.UK));
 		CreditAssesment ca = cac.evaluate(c, a);

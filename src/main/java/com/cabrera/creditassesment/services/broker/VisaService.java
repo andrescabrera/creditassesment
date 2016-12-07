@@ -11,18 +11,23 @@ import com.cabrera.creditassesment.beans.Customer;
  */
 public class VisaService implements CreditCardService {
 
-	/* (non-Javadoc)
-	 * @see com.cabrera.creditassesment.services.broker.CreditCardService#hasCreditDebts(com.cabrera.creditassesment.beans.Customer)
-	 */
-	public Boolean hasCreditDebts(Customer customer) {
-
+	private Customer customer;
+	
+	public VisaService(Customer customer) {
+		super();
+		this.customer = customer;
+	}
+	
+	@Override
+	public Boolean call() throws Exception {
+		System.out.println("calling masterCard for customer " + customer);
 		// WS Connection Latency Time Simulation
 		try {
-			Thread.sleep((long)(Math.random() * 60000));
+			Thread.sleep((long) (Math.random() * 60000));
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		
+
 		return Math.random() < 0.5;
 	}
 

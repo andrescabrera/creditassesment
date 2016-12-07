@@ -3,12 +3,19 @@
  */
 package com.cabrera.creditassesment.engine;
 
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+
 import com.cabrera.creditassesment.beans.Amount;
 import com.cabrera.creditassesment.beans.Business;
 import com.cabrera.creditassesment.beans.CreditAssesment;
 import com.cabrera.creditassesment.beans.Customer;
 import com.cabrera.creditassesment.beans.Person;
 import com.cabrera.creditassesment.services.broker.CreditCardService;
+import com.cabrera.creditassesment.services.broker.MasterCardService;
+import com.cabrera.creditassesment.services.broker.VisaService;
 
 /**
  * Credit Assesment Engine Implementation
@@ -17,25 +24,35 @@ import com.cabrera.creditassesment.services.broker.CreditCardService;
  */
 public class CreditAssesmentEngineImpl implements CreditAssesmentEngine {
 
-	private CreditCardService masterCardService;
-	private CreditCardService visaService;
+	private static final ExecutorService threadpool = Executors
+			.newFixedThreadPool(3);
 
-	public CreditAssesmentEngineImpl(CreditCardService masterCardService,
-			CreditCardService visaService) {
-		this.masterCardService = masterCardService;
-		this.visaService = visaService;
+	public CreditAssesmentEngineImpl() {
 	}
 
-	public CreditAssesment evaluate(Customer customer, Amount amount) {
-		Boolean ruleOne = evaluateByName(customer); //Central Bank rules!
-		Boolean ruleTwo = amount.getAmount() <= 500d; //Business rule, microcredits!
-		Boolean ruleThree = hasCreditCardDebts(customer); //Business rule, no debts!
-		return new CreditAssesment(amount, customer, ruleOne && ruleTwo && ruleThree);
+	public CreditAssesment evaluate(Customer customer, Amount amount) throws InterruptedException, ExecutionException {
+		// Central Bank rules!
+		Boolean ruleOne = evaluateByName(customer);
+		// Business rule from JDBC connection, microcredits!
+		Boolean ruleTwo = amount.getAmount() <= 500d;
+		// Business rule, no debts!
+		Boolean ruleThree = hasCreditCardDebts(customer);
+		return new CreditAssesment(amount, customer, ruleOne && ruleTwo
+				&& ruleThree);
 	}
 
-	private Boolean hasCreditCardDebts(Customer customer) {
-		Boolean masterCardDebts = masterCardService.hasCreditDebts(customer);
-		Boolean visaDebts = visaService.hasCreditDebts(customer);
+	private Boolean hasCreditCardDebts(Customer customer) throws InterruptedException, ExecutionException {
+
+		CreditCardService masterCardService = new MasterCardService(customer);
+		CreditCardService visaService = new VisaService(customer);
+
+		Future<Boolean> masterCardDebtsFuture = threadpool
+				.submit(masterCardService);
+		Future<Boolean> visaDebtsFuture = threadpool.submit(visaService);
+
+		Boolean masterCardDebts = masterCardDebtsFuture.get(); 
+		Boolean visaDebts = visaDebtsFuture.get(); 
+
 		return masterCardDebts && visaDebts;
 	}
 
