@@ -3,6 +3,7 @@
  */
 package com.cabrera.creditassesment.engine;
 
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -11,6 +12,7 @@ import java.util.concurrent.Future;
 import com.cabrera.creditassesment.beans.Amount;
 import com.cabrera.creditassesment.beans.Business;
 import com.cabrera.creditassesment.beans.CreditAssesment;
+import com.cabrera.creditassesment.beans.CreditCardMovement;
 import com.cabrera.creditassesment.beans.Customer;
 import com.cabrera.creditassesment.beans.Person;
 import com.cabrera.creditassesment.services.broker.CreditCardService;
@@ -25,7 +27,7 @@ import com.cabrera.creditassesment.services.broker.VisaService;
 public class CreditAssesmentEngineImpl implements CreditAssesmentEngine {
 
 	private static final ExecutorService threadpool = Executors
-			.newFixedThreadPool(3);
+			.newFixedThreadPool(2);
 
 	public CreditAssesmentEngineImpl() {
 	}
@@ -42,18 +44,10 @@ public class CreditAssesmentEngineImpl implements CreditAssesmentEngine {
 	}
 
 	private Boolean hasCreditCardDebts(Customer customer) throws InterruptedException, ExecutionException {
-
-		CreditCardService masterCardService = new MasterCardService(customer);
-		CreditCardService visaService = new VisaService(customer);
-
-		Future<Boolean> masterCardDebtsFuture = threadpool
-				.submit(masterCardService);
-		Future<Boolean> visaDebtsFuture = threadpool.submit(visaService);
-
-		Boolean masterCardDebts = masterCardDebtsFuture.get(); 
-		Boolean visaDebts = visaDebtsFuture.get(); 
-
-		return masterCardDebts && visaDebts;
+		CreditCardBroker broker = new CreditCardBrokerServiceImpl(customer);
+		Future<List<List<CreditCardMovement>>> creditCardMovementsFuture = threadpool.submit(broker);
+		List<List<CreditCardMovement>> creditCardMovements = creditCardMovementsFuture.get();
+		return creditCardMovements.size() == 2 && (creditCardMovements.get(1).size() > 0 || creditCardMovements.get(2).size() > 0);
 	}
 
 	private Boolean evaluateByName(Customer customer) {

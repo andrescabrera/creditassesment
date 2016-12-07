@@ -3,6 +3,14 @@
  */
 package com.cabrera.creditassesment.services.broker;
 
+import java.util.ArrayList;
+import java.util.Currency;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+
+import com.cabrera.creditassesment.beans.Amount;
+import com.cabrera.creditassesment.beans.CreditCardMovement;
 import com.cabrera.creditassesment.beans.Customer;
 
 /**
@@ -19,8 +27,10 @@ public class VisaService implements CreditCardService {
 	}
 	
 	@Override
-	public Boolean call() throws Exception {
-		System.out.println("calling masterCard for customer " + customer);
+	public List<CreditCardMovement> call() throws Exception {
+		List<CreditCardMovement> visaMovements = new ArrayList<CreditCardMovement>();
+		System.out.println("calling visa for customer " + customer);
+
 		// WS Connection Latency Time Simulation
 		try {
 			Thread.sleep((long) (Math.random() * 60000));
@@ -28,7 +38,8 @@ public class VisaService implements CreditCardService {
 			e.printStackTrace();
 		}
 
-		return Math.random() < 0.5;
+		visaMovements.add(new CreditCardMovement(new Date(), "Visa International", new Amount(568.25d, Currency.getInstance(Locale.US))));
+		return visaMovements;
 	}
 
 }
