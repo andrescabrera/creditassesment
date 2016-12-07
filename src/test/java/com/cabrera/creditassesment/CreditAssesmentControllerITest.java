@@ -14,6 +14,7 @@ import com.cabrera.creditassesment.beans.Amount;
 import com.cabrera.creditassesment.beans.CreditAssesment;
 import com.cabrera.creditassesment.beans.Customer;
 import com.cabrera.creditassesment.beans.Person;
+import com.cabrera.creditassesment.controllers.CreditAssesmentController;
 
 public class CreditAssesmentControllerITest {
 
@@ -24,7 +25,7 @@ public class CreditAssesmentControllerITest {
 	 */
 	@Test
 	public void testEvaluate() {
-		Customer c = new Person("Andrés", "Cabrera Laden");
+		Customer c = new Person("Andrï¿½s", "Cabrera Laden");
 		Amount a = new Amount(50d, Currency.getInstance(Locale.UK));
 		CreditAssesment ca = cac.evaluate(c, a);
 		assertFalse(ca.isValid());

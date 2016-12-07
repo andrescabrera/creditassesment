@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.cabrera.creditassesment;
+package com.cabrera.creditassesment.controllers;
 
 import com.cabrera.creditassesment.beans.Amount;
 import com.cabrera.creditassesment.beans.Customer;
