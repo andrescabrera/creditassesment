@@ -3,8 +3,9 @@
  */
 package com.cabrera.creditassesment.services.broker;
 
+import io.reactivex.Observable;
+
 import java.util.List;
-import java.util.concurrent.Callable;
 
 import com.cabrera.creditassesment.beans.CreditCardMovement;
 
@@ -13,6 +14,6 @@ import com.cabrera.creditassesment.beans.CreditCardMovement;
  * 
  * @author L0656968
  */
-public interface CreditCardService extends Callable<List<CreditCardMovement>> {
-
+public interface CreditCardService {
+	Observable<List<CreditCardMovement>> call();
 }

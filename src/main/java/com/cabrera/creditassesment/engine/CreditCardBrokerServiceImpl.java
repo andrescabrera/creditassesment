@@ -1,10 +1,8 @@
 package com.cabrera.creditassesment.engine;
 
-import java.util.ArrayList;
+import io.reactivex.Observable;
+
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 import com.cabrera.creditassesment.beans.CreditCardMovement;
 import com.cabrera.creditassesment.beans.Customer;
@@ -14,9 +12,6 @@ import com.cabrera.creditassesment.services.broker.VisaService;
 
 public class CreditCardBrokerServiceImpl implements CreditCardBroker {
 
-	private static final ExecutorService threadpool = Executors
-			.newFixedThreadPool(2);
-	
 	private Customer customer;
 	
 	public CreditCardBrokerServiceImpl(Customer customer) {
@@ -25,23 +20,14 @@ public class CreditCardBrokerServiceImpl implements CreditCardBroker {
 	}
 
 	@Override
-	public List<List<CreditCardMovement>> call() throws Exception {
-		List<List<CreditCardMovement>> creditCardMovements = new ArrayList<List<CreditCardMovement>>();
-		
+	public Observable<List<CreditCardMovement>> call() {
 		CreditCardService masterCardService = new MasterCardService(customer);
 		CreditCardService visaService = new VisaService(customer);
 
-		Future<List<CreditCardMovement>> masterCardDebtsFuture = threadpool
-				.submit(masterCardService);
-		Future<List<CreditCardMovement>> visaDebtsFuture = threadpool.submit(visaService);
+		Observable<List<CreditCardMovement>> masterCardDebtsObs = masterCardService.call();
+		Observable<List<CreditCardMovement>> visaDebtsObs = visaService.call();
 
-		List<CreditCardMovement> masterCardDebts = masterCardDebtsFuture.get(); 
-		List<CreditCardMovement> visaDebts = visaDebtsFuture.get(); 
-		
-		creditCardMovements.add(masterCardDebts);
-		creditCardMovements.add(visaDebts);
-		
-		return creditCardMovements;
+		return Observable.merge(masterCardDebtsObs, visaDebtsObs);
 	}
 
 }

@@ -3,6 +3,8 @@
  */
 package com.cabrera.creditassesment.engine;
 
+import io.reactivex.Observable;
+
 import java.util.concurrent.ExecutionException;
 
 import com.cabrera.creditassesment.beans.Amount;
@@ -16,6 +18,6 @@ import com.cabrera.creditassesment.beans.CreditAssesment;
  */
 public interface CreditAssesmentEngine {
 
-	CreditAssesment evaluate(Customer customer, Amount amount) throws InterruptedException, ExecutionException;
+	Observable<CreditAssesment> evaluate(Customer customer, Amount amount) throws InterruptedException, ExecutionException;
 
 }

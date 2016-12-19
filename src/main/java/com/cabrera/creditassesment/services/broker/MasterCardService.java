@@ -3,6 +3,8 @@
  */
 package com.cabrera.creditassesment.services.broker;
 
+import io.reactivex.Observable;
+
 import java.util.ArrayList;
 import java.util.Currency;
 import java.util.Date;
@@ -21,17 +23,28 @@ import com.cabrera.creditassesment.beans.Customer;
 public class MasterCardService implements CreditCardService {
 
 	private Customer customer;
-	
+
 	public MasterCardService(Customer customer) {
 		super();
 		this.customer = customer;
 	}
 
 	@Override
-	public List<CreditCardMovement> call() throws Exception {
+	public Observable<List<CreditCardMovement>> call() {
+		return Observable.defer(() -> Observable.just(createMasterCardMovements()));
+	}
+
+	/**
+	 * Retrieve CreditCard Movements debts from WS... (the sync part).
+	 * 
+	 * That must be called from async way..
+	 * 
+	 * @return List of CreditCardMovements
+	 */
+	private List<CreditCardMovement> createMasterCardMovements() {
 		List<CreditCardMovement> masterCardMovements = new ArrayList<CreditCardMovement>();
-		
-		System.out.println("calling masterCard for customer " + customer);
+		double milis = Math.random() * 30000;
+		System.out.println("calling masterCard for customer " + customer + " i will going to take " + milis/1000 + " seconds.");
 		// WS Connection Latency Time Simulation
 		try {
 			Thread.sleep((long) (Math.random() * 60000));
@@ -39,8 +52,10 @@ public class MasterCardService implements CreditCardService {
 			e.printStackTrace();
 		}
 
-		masterCardMovements.add(new CreditCardMovement(new Date(), "Master Card", new Amount(5098.45d, Currency.getInstance(Locale.UK))));
+		masterCardMovements.add(new CreditCardMovement(new Date(), "Master Card", new Amount(5098.4225d, Currency.getInstance(Locale.UK))));
+		masterCardMovements.add(new CreditCardMovement(new Date(), "Master Card", new Amount(123.123d, Currency.getInstance(Locale.UK))));
+		masterCardMovements.add(new CreditCardMovement(new Date(), "Master Card", new Amount(543.435d, Currency.getInstance(Locale.UK))));
 		return masterCardMovements;
 	}
-	
+
 }
