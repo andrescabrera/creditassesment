@@ -1,6 +1,7 @@
 package com.cabrera.creditassesment.engine;
 
 import io.reactivex.Observable;
+import io.reactivex.schedulers.Schedulers;
 
 import java.util.List;
 
@@ -24,8 +25,8 @@ public class CreditCardBrokerServiceImpl implements CreditCardBroker {
 		CreditCardService masterCardService = new MasterCardService(customer);
 		CreditCardService visaService = new VisaService(customer);
 
-		Observable<List<CreditCardMovement>> masterCardDebtsObs = masterCardService.call();
-		Observable<List<CreditCardMovement>> visaDebtsObs = visaService.call();
+		Observable<List<CreditCardMovement>> masterCardDebtsObs = masterCardService.call().subscribeOn(Schedulers.io());
+		Observable<List<CreditCardMovement>> visaDebtsObs = visaService.call().subscribeOn(Schedulers.io());
 
 		return Observable.merge(masterCardDebtsObs, visaDebtsObs);
 	}

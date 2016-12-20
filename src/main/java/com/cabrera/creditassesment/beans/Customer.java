@@ -33,5 +33,15 @@ public abstract class Customer {
 	public Date getRegistrationDate() {
 		return registrationDate;
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("Customer [registrationDate=").append(registrationDate)
+				.append(", assesments=").append(assesments)
+				.append(", toString()=").append(super.toString()).append("]");
+		return builder.toString();
+	}
+	
 	
 }

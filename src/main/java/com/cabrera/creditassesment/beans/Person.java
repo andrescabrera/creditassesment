@@ -36,5 +36,16 @@ public class Person extends Customer {
 	public void setLastname(String lastname) {
 		this.lastname = lastname;
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("Person [name=").append(name).append(", surname=")
+				.append(surname).append(", lastname=").append(lastname)
+				.append(", countAssesments()=").append(countAssesments())
+				.append(", getRegistrationDate()=")
+				.append(getRegistrationDate()).append("]");
+		return builder.toString();
+	}
 	
 }

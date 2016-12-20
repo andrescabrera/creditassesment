@@ -5,6 +5,7 @@ package com.cabrera.creditassesment.services.broker;
 
 import io.reactivex.Observable;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Currency;
 import java.util.Date;
@@ -44,10 +45,13 @@ public class MasterCardService implements CreditCardService {
 	private List<CreditCardMovement> createMasterCardMovements() {
 		List<CreditCardMovement> masterCardMovements = new ArrayList<CreditCardMovement>();
 		double milis = Math.random() * 30000;
+		Date startDate = new Date();
+		System.out.println("MasterCard service call Thread name: " + Thread.currentThread().getName());
+		System.out.println("MasterCard service call Starting at: " + new Timestamp(startDate.getTime()));
 		System.out.println("calling masterCard for customer " + customer + " i will going to take " + milis/1000 + " seconds.");
 		// WS Connection Latency Time Simulation
 		try {
-			Thread.sleep((long) (Math.random() * 60000));
+			Thread.sleep((long) milis);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -55,6 +59,9 @@ public class MasterCardService implements CreditCardService {
 		masterCardMovements.add(new CreditCardMovement(new Date(), "Master Card", new Amount(5098.4225d, Currency.getInstance(Locale.UK))));
 		masterCardMovements.add(new CreditCardMovement(new Date(), "Master Card", new Amount(123.123d, Currency.getInstance(Locale.UK))));
 		masterCardMovements.add(new CreditCardMovement(new Date(), "Master Card", new Amount(543.435d, Currency.getInstance(Locale.UK))));
+		Date actualDate = new Date();
+		long diff = (actualDate.getTime() - startDate.getTime()) / 1000;
+		System.out.println("MasterCard  service call Finished on: " + new Timestamp(actualDate.getTime()) + ". Took " + diff + " seconds.");
 		return masterCardMovements;
 	}
 

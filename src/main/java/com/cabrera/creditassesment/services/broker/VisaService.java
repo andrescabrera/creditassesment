@@ -5,6 +5,7 @@ package com.cabrera.creditassesment.services.broker;
 
 import io.reactivex.Observable;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Currency;
 import java.util.Date;
@@ -44,17 +45,24 @@ public class VisaService implements CreditCardService {
 	private List<CreditCardMovement> createVisaMovements() {
 		List<CreditCardMovement> visaMovements = new ArrayList<CreditCardMovement>();
 		double milis = Math.random() * 30000;
-		System.out.println("calling visa for customer " + customer + " i will going to take " + milis/1000 + " seconds.");
+		Date startDate = new Date();
+		System.out.println("Visa Service - Starting at: " + new Timestamp(startDate.getTime()));
+		System.out.println("Visa Service - Thread name: " + Thread.currentThread().getName());
+		System.out.println("Visa Service - Calling Visa for customer " + customer + ". it will going to take " + milis/1000 + " seconds.");
 
 		// WS Connection Latency Time Simulation
 		try {
-			Thread.sleep((long) (milis));
+			Thread.sleep((long) milis);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 
 		visaMovements.add(new CreditCardMovement(new Date(), "Visa International", new Amount(568.25d, Currency
 						.getInstance(Locale.US))));
+		Date actualDate = new Date();
+		long diff = (actualDate.getTime() - startDate.getTime()) / 1000;
+		System.out.println("Visa service call Finished on: " + new Timestamp(actualDate.getTime()) + ". Took " + diff + " seconds.");
+		
 		return visaMovements;
 	}
 
