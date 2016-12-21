@@ -3,8 +3,13 @@
  */
 package com.cabrera.creditassesment.engine;
 
+import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Observable;
+import io.reactivex.Observer;
+import io.reactivex.Single;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Action;
 
 import java.util.Iterator;
 import java.util.List;
@@ -24,22 +29,27 @@ import com.cabrera.creditassesment.beans.Person;
  */
 public class CreditAssesmentEngineImpl implements CreditAssesmentEngine {
 
-	public CreditAssesmentEngineImpl() {}
+	public CreditAssesmentEngineImpl() {
+	}
 
-	public Observable<CreditAssesment> evaluate(Customer customer, Amount amount) throws InterruptedException, ExecutionException {
+	public Single<CreditAssesment> evaluate(Customer customer, Amount amount)
+			throws InterruptedException, ExecutionException {
 		// Central Bank rules!
-		Observable<Boolean> ruleOne = evaluateByName(customer);
+		Single<Boolean> ruleOne = evaluateByName(customer);
 		// Business rule from JDBC connection, microcredits!
-		Observable<Boolean> ruleTwo = evaluateAmount(amount);
+		Single<Boolean> ruleTwo = evaluateAmount(amount);
 		// Business rule, no debts!
-		Observable<Boolean> ruleThree = hasCreditCardDebts(customer);
-		
-		Observable<Boolean> rules = Observable.merge(ruleOne, ruleTwo, ruleThree);
-		Maybe<Boolean> mayBeRules = rules.reduce((x, y) -> x && y);
-		
-		CreditAssesment assesment = new CreditAssesment(amount, customer, mayBeRules.blockingGet());
-		
-		return Observable.just(assesment);
+		Single<Boolean> ruleThree = hasCreditCardDebts(customer);
+
+		Flowable<Boolean> rules = Single.merge(ruleOne, ruleTwo, ruleThree);
+
+		Single<CreditAssesment> assesmentObs = Single.create(caEmitter -> {
+			rules.reduce((ruleX, ruleY) -> ruleX && ruleY).subscribe(rulesRedux -> {
+				caEmitter.onSuccess(new CreditAssesment(amount, customer, rulesRedux));
+			});
+		});
+
+		return assesmentObs;
 	}
 
 	/**
@@ -49,31 +59,18 @@ public class CreditAssesmentEngineImpl implements CreditAssesmentEngine {
 	 *            Required Amount
 	 * @return Single boolean Observable
 	 */
-	private Observable<Boolean> evaluateAmount(Amount amount) {
+	private Single<Boolean> evaluateAmount(Amount amount) {
 		Double maxAmountPermitted = 500d;
-		return Observable.just(amount.getAmount() <= maxAmountPermitted);
+		return Single.just(amount.getAmount() <= maxAmountPermitted);
 	}
 
-	private Observable<Boolean> hasCreditCardDebts(Customer customer)
+	private Single<Boolean> hasCreditCardDebts(Customer customer)
 			throws InterruptedException, ExecutionException {
 		CreditCardBroker broker = new CreditCardBrokerServiceImpl(customer);
-		Observable<List<CreditCardMovement>> creditCardMovementsObs = broker
-				.call();
-		Iterable<List<CreditCardMovement>> creditCardMovements = creditCardMovementsObs
-				.blockingIterable();
-
-		Boolean hasDebts = false;
-		Iterator<List<CreditCardMovement>> creditCardMovIterator = creditCardMovements.iterator();
-		while (creditCardMovIterator.hasNext()) {
-			List<CreditCardMovement> movement = creditCardMovIterator.next();
-			if (movement.size() > 0) {
-				hasDebts = true;
-			}
-		}
-		return Observable.just(hasDebts);
+		return broker.call().any(x -> x.size() > 0);
 	}
 
-	private Observable<Boolean> evaluateByName(Customer customer) {
+	private Single<Boolean> evaluateByName(Customer customer) {
 		if (customer instanceof Person) {
 			return evaluatePersonByName((Person) customer);
 		} else {
@@ -81,22 +78,22 @@ public class CreditAssesmentEngineImpl implements CreditAssesmentEngine {
 		}
 	}
 
-	private Observable<Boolean> evaluatePersonByName(Person person) {
+	private Single<Boolean> evaluatePersonByName(Person person) {
 		if (person.getLastname().toLowerCase().endsWith("laden")) {
-			return Observable.just(false);
+			return Single.just(false);
 		} else {
-			return Observable.just(true);
+			return Single.just(true);
 		}
 	}
 
-	private Observable<Boolean> evaluateBusinessByName(Business business) {
+	private Single<Boolean> evaluateBusinessByName(Business business) {
 		// Retrieve prohibited words from DB
 		String prohibitedWord = "qaeda";
 
 		if (business.getName().toLowerCase().endsWith(prohibitedWord)) {
-			return Observable.just(false);
+			return Single.just(false);
 		} else {
-			return Observable.just(true);
+			return Single.just(true);
 		}
 	}
 

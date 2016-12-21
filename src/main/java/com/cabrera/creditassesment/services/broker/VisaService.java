@@ -44,7 +44,7 @@ public class VisaService implements CreditCardService {
 	 */
 	private List<CreditCardMovement> createVisaMovements() {
 		List<CreditCardMovement> visaMovements = new ArrayList<CreditCardMovement>();
-		double milis = Math.random() * 30000;
+		double milis = Math.random() * 60000;
 		Date startDate = new Date();
 		System.out.println("Visa Service - Starting at: " + new Timestamp(startDate.getTime()));
 		System.out.println("Visa Service - Thread name: " + Thread.currentThread().getName());

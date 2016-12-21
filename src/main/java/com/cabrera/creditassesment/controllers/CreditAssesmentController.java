@@ -28,7 +28,7 @@ public class CreditAssesmentController {
 	}
 
 	public CreditAssesment evaluate(Customer customer, Amount amount) throws InterruptedException, ExecutionException {
-		return this.creditAssesmentService.evaluate(customer, amount).blockingSingle();
+		return this.creditAssesmentService.evaluate(customer, amount).blockingGet();
 	}
 
 }

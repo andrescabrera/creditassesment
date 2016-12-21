@@ -44,7 +44,7 @@ public class MasterCardService implements CreditCardService {
 	 */
 	private List<CreditCardMovement> createMasterCardMovements() {
 		List<CreditCardMovement> masterCardMovements = new ArrayList<CreditCardMovement>();
-		double milis = Math.random() * 30000;
+		double milis = Math.random() * 60000;
 		Date startDate = new Date();
 		System.out.println("MasterCard service call Thread name: " + Thread.currentThread().getName());
 		System.out.println("MasterCard service call Starting at: " + new Timestamp(startDate.getTime()));

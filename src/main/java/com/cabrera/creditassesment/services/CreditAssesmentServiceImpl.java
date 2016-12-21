@@ -3,7 +3,7 @@
  */
 package com.cabrera.creditassesment.services;
 
-import io.reactivex.Observable;
+import io.reactivex.Single;
 
 import java.util.concurrent.ExecutionException;
 
@@ -25,7 +25,7 @@ public class CreditAssesmentServiceImpl implements CreditAssesmentService {
 		this.engine = engine;
 	}
 
-	public Observable<CreditAssesment> evaluate(Customer customer, Amount amount) throws InterruptedException, ExecutionException {
+	public Single<CreditAssesment> evaluate(Customer customer, Amount amount) throws InterruptedException, ExecutionException {
 		return engine.evaluate(customer, amount);
 	}
 
